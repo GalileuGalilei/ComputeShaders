@@ -122,7 +122,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\glfw\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\glfw\include;$(SolutionDir)include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -153,22 +153,29 @@
   <ItemGroup>
     <ClCompile Include="camera\cam.cpp" />
     <ClCompile Include="GLAD\src\glad.c" />
-    <ClCompile Include="glfw\include\ShaderPro.cpp" />
+    <ClCompile Include="src\Mesh.cpp" />
+    <ClCompile Include="src\ShaderPro.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="glfw\include\stb_image.cpp" />
+    <ClCompile Include="src\stb_image.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)glfw\include;$(SolutionDir)include;</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="src\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\tests\ComputeShaders\glfw\include\glad\glad.h" />
     <ClInclude Include="camera\cam.h" />
     <ClInclude Include="GLAD\include\glad\glad.h" />
     <ClInclude Include="glfw\include\glad\glad.h" />
-    <ClInclude Include="glfw\include\ShadersPro.h" />
-    <ClInclude Include="glfw\include\stb_image.h" />
-    <ClInclude Include="glfw\include\Texture.h" />
+    <ClInclude Include="include\ShadersPro.h" />
+    <ClInclude Include="include\stb_image.h" />
+    <ClInclude Include="include\Texture.h" />
+    <ClInclude Include="include\Mesh.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\FragmentShader.glsl" />
     <None Include="shaders\VertexShader.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="glfw\glfw3.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

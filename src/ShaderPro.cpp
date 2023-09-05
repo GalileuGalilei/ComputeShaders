@@ -81,4 +81,18 @@ void ShaderProgram::Delete()
 	glDeleteProgram(ShaderProgramID);
 }
 
+void ShaderProgram::SetTexture(Texture* tex, const char* sampler)
+{
+	tex->Bind();
+	glUniform1i(glGetUniformLocation(ShaderProgramID, sampler), texturesBinds.size());
+	texturesBinds.insert(std::pair<unsigned int, unsigned int>(texturesBinds.size(), tex->Id()));
+	tex->Unbind();
+}
+
+void ShaderProgram::ActivateTexture(Texture* tex)
+{
+	tex->Bind();
+	glActiveTexture(texturesBinds[tex->Id()]);
+}
+
 

@@ -1,10 +1,10 @@
 #include "glad/glad.h" 
 #include "GLFW/glfw3.h"
 #include "iostream"
-#include "stb_image.h"
-#include "glfw/include/ShadersPro.h"
+#include "ShadersPro.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include "Mesh.h"
 #include "glm/gtc/type_ptr.hpp"
 #define PI 3.14159265358979
 #define MARGINS 0.6
@@ -17,83 +17,29 @@ int window_heigh = 480;
 float lastX = window_width * 0.5f;
 float lastY = window_heigh * 0.5f;
 bool first_mouse = true;
+GLFWwindow* window;
 
 
-
-float line[] =
-{
-	-1.0f, 0.0f, 0.0f,
-	 1.0f, 0.0f, 0.0f
-};
-
-float square[] =
+std::vector<float> squarePosition =
 {          
-	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+	-0.5f, 0.5f, 0.0f,	//0
+	-0.5f, -0.5f, 0.0f, //1
+	0.5f, -0.5f, 0.0f,	//2
+	0.5f, 0.5f, 0.0f	//3
 };
 
-float cube[] = 
-{  //vertice:			  texturas:
-	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-};
-
-glm::vec3 cube_position[] =
+std::vector<float> squareTexture =
 {
-	glm::vec3(2.4f, -0.4f, -3.5f),
-	glm::vec3(-1.7f,  3.0f, -7.5f),
-	glm::vec3(2.0f,  5.0f, -15.0f),
-	glm::vec3(1.3f, -2.0f, -2.5f),
-	glm::vec3(-1.3f,  1.0f, -1.5f)
+	0.0f, 1.0f,	//0
+	0.0f, 0.0f,	//1
+	1.0f, 0.0f,	//2
+	1.0f, 1.0f	//3
 };
 
-GLuint Indice[] =
+std::vector<GLuint> SquareIndice =
 {
-	0,1,2,
-	1,2,3
+	0,1,2, //triangle
+	1,2,3  //triangle
 };
 
 glm::vec3 camera_position(0.0f, 0.0f, 3.0f);
@@ -117,7 +63,9 @@ float mod(float a, float b)
 	return b;
 }
 
-void key_input(GLFWwindow* window)
+#pragma region Callbacks
+
+void OnKeyboardInput(GLFWwindow* window)
 {
 	
 	if (glfwGetKey(window, GLFW_KEY_W))
@@ -161,7 +109,7 @@ void key_input(GLFWwindow* window)
 	camera_y_axis = glm::cross(camera_direction, camera_x_axis);
 }
 
-void mouse_input(GLFWwindow* window, double xpos, double ypos)
+void OnMouseInput(GLFWwindow* window, double xpos, double ypos)
 {
 	if (first_mouse)
 	{
@@ -194,156 +142,73 @@ void mouse_input(GLFWwindow* window, double xpos, double ypos)
 	camera_target += camera_position;
 }
 
+void OnWindowResize(GLFWwindow* window, int width, int height)
+{
+	glViewport(0, 0, width, height);
+	glm::mat4 projection_matrix = glm::perspective((float)PI / 4, (float)width / height, 0.1f, 300.0f);
+	glm::mat4 aux = glm::mat4(MARGINS);
+	projection_matrix *= aux;
+}
+
+#pragma endregion
+
+void InitGladAndGLFW()
+{
+	glfwInit();
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+	window = glfwCreateWindow(window_width, window_heigh, "JANELA", NULL, NULL);
+	glfwMakeContextCurrent(window);
+	glfwSetCursorPosCallback(window, OnMouseInput);
+	glfwSetFramebufferSizeCallback(window, OnWindowResize);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	{
+		std::cout << "Failed to initialize GLAD" << std::endl;
+	}
+}
+
+void InitOpenGL()
+{
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glEnable(GL_DEPTH_TEST);
+
+	//Viewport
+	glViewport(0, 0, window_width, window_heigh);
+}
 
 int main()
 {
-	//Glfw and window initialization
-		glfwInit();
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-		GLFWwindow* window = glfwCreateWindow(window_width, window_heigh, "JANELA", NULL, NULL);
-		glfwMakeContextCurrent(window);
-		glfwSetCursorPosCallback(window, mouse_input);
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-	//GLAD load
-		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-		{
-		std::cout << "Failed to initialize GLAD" << std::endl;
-		return -1;
-		}
-		glEnable(GL_DEPTH_TEST);
-
-	//Viewport
-		glViewport(0, 0, window_width, window_heigh);
-		glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int heigh)->void
-		{
-			glViewport(0, 0, width, heigh);
-			glm::mat4 projection_matrix = glm::perspective((float)PI / 4, (float)width / heigh, 0.1f, 300.0f);
-			glm::mat4 aux = glm::mat4(MARGINS);
-			projection_matrix *= aux;
-		});
-
-		
+	InitGladAndGLFW();
+	InitOpenGL();		
 
 	//Shaders creation
 		ShaderProgram SHADER;
 	
 		SHADER.CreateShader(GL_VERTEX_SHADER, "shaders/VertexShader.glsl");
 		SHADER.CreateShader(GL_FRAGMENT_SHADER, "shaders/FragmentShader.glsl");
-	
 		SHADER.Use();
 
-	//Texture
-		
-		//variables
-		int image_width, image_heigh, image_chanels;
-		unsigned int textureID[1];
-		unsigned char* image_data = stbi_load("textures/metal.jpg", &image_width, &image_heigh, &image_chanels, 0);
-
-		//texture id creation
-		glGenTextures(1, &textureID[0]);
-
-		//texture bind
-		glBindTexture(GL_TEXTURE_2D, textureID[0]);
-
-		//texture parameters
-		glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-		//texture error test and generation
-		if (image_data)
-		{
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image_width, image_heigh, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
-			glGenerateMipmap(GL_TEXTURE_2D);
-		}
-		else
-		{
-			std::cout << "Error: texture load failed :(" << std::endl;
-		}
-
-		//unbinding / deleting
-		glBindTexture(GL_TEXTURE_2D, 0);
-		stbi_image_free(image_data);
-
 		//texture to shader
-		int TexLocation = glGetUniformLocation(SHADER.ShaderProgramID,"Texture0");
-		glUniform1i(TexLocation, 0);
+		Texture* tex = new Texture("metal.jpg", true);
+		SHADER.SetTexture(tex, "Texture0");
 
-	//tranformations
-		//scalar-matrix multiplication, matrix-vector
-		//multiplication and matrix-matrix multiplication
-
-		glm::mat4 tran = glm::mat4(1.0f);
-		tran = glm::rotate(tran, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-
-		unsigned int mat_location = glGetUniformLocation(SHADER.ShaderProgramID, "transform");
-		glUniformMatrix4fv(mat_location, 1, GL_FALSE, glm::value_ptr(tran));
-
-
-		//going 3D...
-
-		//model...
+		Mesh* mesh = new Mesh();
+		mesh->AddVerticesAttribute(0, squarePosition, 3);
+		mesh->AddVerticesAttribute(1, squareTexture, 2);
+		mesh->AddIndices(SquareIndice);
+		
+		//transformations
 		glm::mat4 model_matrix(1.0f);
-
-		//view...
-		glm::mat4 view_matrix(1.0f);
-		view_matrix = glm::translate(view_matrix, glm::vec3(0.0f, 0.0f, -3.0f));
-
-		//perpective projection...
+		glm::mat4 view_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
 		glm::mat4 projection_matrix = glm::perspective((float)PI / 4, (float)window_width / window_heigh, 0.1f, 300.0f);
 
-
-	//Vertice buffer generation 
-		//GLuint EBO; sem indices po enquanto...
-		GLuint VBO[2];
-		GLuint VAO[2];
-
-
-		//buffer creation
-		glGenBuffers(2, VBO);
-		//glGenBuffers(1, &EBO); //indices q por enquanto vao fica de lado
-		glGenVertexArrays(2, VAO);
-
-		//buffer binding
-		glBindVertexArray(VAO[0]);
-		glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-
-		//buffer data assingment
-		glBufferData(GL_ARRAY_BUFFER, sizeof(cube), cube, GL_STATIC_DRAW);
-		//glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(Indice), Indice, GL_STATIC_DRAW);
-
-		//vertex attributes
-		glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,5*sizeof(float), (void*)0);
-		glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,5*sizeof(float), (void*)(3 * sizeof(float)));
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
-
-		//buffer unbinding
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	
-
-		//---------------------
-
-		glBindVertexArray(VAO[1]);
-		glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-
-		glBufferData(GL_ARRAY_BUFFER, sizeof(line), line, GL_STATIC_DRAW);
-
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(0);
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
+		int model_location = glGetUniformLocation(SHADER.ShaderProgramID, "model");
+		int view_location = glGetUniformLocation(SHADER.ShaderProgramID, "view");
+		int projection_location = glGetUniformLocation(SHADER.ShaderProgramID, "projection");
 
 
 	//Update loop
@@ -355,7 +220,7 @@ int main()
 			glfwSetWindowShouldClose(window, true);
 		}
 
-		key_input(window);
+		OnKeyboardInput(window);
 		
 
 
@@ -364,9 +229,7 @@ int main()
 		glClearColor(0.75f, 0.23f, 0.46f, 1.0f);
 
 		//binding all
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, textureID[0]);
-		glBindVertexArray(VAO[0]);
+		SHADER.ActivateTexture(tex);
 		SHADER.Use();
 
 		//updating
@@ -377,11 +240,6 @@ int main()
 			camera_target,
 			glm::vec3(0.0f,1.0f,0.0f)
 		);
-
-
-		int model_location = glGetUniformLocation(SHADER.ShaderProgramID, "model");
-		int view_location = glGetUniformLocation(SHADER.ShaderProgramID, "view");
-		int projection_location = glGetUniformLocation(SHADER.ShaderProgramID, "projection");
 		
 
 		glUniformMatrix4fv(model_location, 1, false, glm::value_ptr(model_matrix));
@@ -389,49 +247,15 @@ int main()
 		glUniformMatrix4fv(projection_location, 1, false, glm::value_ptr(projection_matrix));
 
 
-		//draw and buffer_Swap
-		for (int i = 0; i < 5; i++)
-		{
-			model_matrix = glm::translate(glm::mat4(1.0f), cube_position[i]);
-			model_matrix = glm::rotate(model_matrix, (float)glfwGetTime() * ((float)PI / 4), glm::vec3(1.0f, 0.5f, 0.5f));
-			glUniformMatrix4fv(model_location, 1, false, glm::value_ptr(model_matrix));
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-		}
-
-		glBindTexture(GL_TEXTURE_2D, 0);
-		glBindVertexArray(VAO[1]);
-		
-		for(int i = 1; i < 150; i++)
-		{
-			model_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, -5.0f - camera_position.y, 75 - i - mod(1, camera_position.z)));
-			model_matrix = glm::translate(model_matrix, camera_position);
-			model_matrix = glm::scale(model_matrix, glm::vec3(75.0f, 1.0f, 1.0f));
-			glUniformMatrix4fv(model_location, 1, false, glm::value_ptr(model_matrix));
-			glDrawArrays(GL_LINES, 0, 2);
-		}
-		
-		for (int i = 1; i < 150; i++)
-		{
-			model_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(75 - i - mod(1, camera_position.x), -5.0f - camera_position.y, 0.0f));
-			model_matrix = glm::translate(model_matrix, camera_position);
-			model_matrix = glm::scale(model_matrix, glm::vec3(1.0f, 1.0f, 75.0f));
-			model_matrix = glm::rotate(model_matrix, (float)PI / 2.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-			glUniformMatrix4fv(model_location, 1, false, glm::value_ptr(model_matrix));
-			glDrawArrays(GL_LINES, 0, 2);
-		}
-
-
+		//drawing
+		mesh->DrawMesh();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-
 	}
 
-	//Unbinding / deleting all
-		glDeleteVertexArrays(2, VAO);
-		glDeleteBuffers(2, VBO);
-		//glDeleteBuffers(1, &EBO);
-		SHADER.Delete();
-		glfwTerminate();
+	mesh->DeleteMesh();
+	SHADER.Delete();
+	glfwTerminate();
 
 	return 0;
 }
