@@ -40,18 +40,28 @@ ShaderProgram::ShaderProgram()
 void ShaderProgram::CreateShader(GLenum ShaderType, const char* Path)
 {
 	GLuint ShaderT = glCreateShader(ShaderType);
-	glShaderSource(ShaderT, 1, ShaderSource(Path), NULL);
+	char** source = ShaderSource(Path);
+	glShaderSource(ShaderT, 1, source, NULL);
 	glCompileShader(ShaderT);
 
 	int sucesso;
-	char ErrorInfo[512];
+	char* ErrorInfo;
 	glGetShaderiv(ShaderT, GL_COMPILE_STATUS, &sucesso);
 
 	if (!sucesso)
 	{
-		glGetProgramInfoLog(ShaderT, 512, NULL, ErrorInfo);
-		std::cout << "ERRO NO GLSL: \n" << ErrorInfo << std::endl;
+		int logLenght;
+		glGetShaderiv(ShaderT, GL_INFO_LOG_LENGTH, &logLenght);
+		ErrorInfo = new char[logLenght + 1];
 
+		glGetShaderInfoLog(ShaderT, logLenght, NULL, ErrorInfo);
+
+		if (logLenght > 0)
+		{
+			std::cout << "GLSL ERROR: \n" << ErrorInfo << std::endl;
+		}
+
+		delete[] ErrorInfo;
 	}
 
 	glAttachShader(ShaderProgramID, ShaderT);
@@ -59,16 +69,23 @@ void ShaderProgram::CreateShader(GLenum ShaderType, const char* Path)
 
 	glGetProgramiv(ShaderProgramID, GL_LINK_STATUS, &sucesso);
 
-	if (!sucesso) {
-		glGetProgramInfoLog(ShaderProgramID, 512, NULL, ErrorInfo);
-		std::cout << "ERRO DE LINK: \n" << ErrorInfo << std::endl;
+	if (!sucesso) 
+	{
+		int logLenght;
+		glGetProgramiv(ShaderProgramID, GL_INFO_LOG_LENGTH, &logLenght);
+		ErrorInfo = new char[logLenght + 1];
 
+		glGetProgramInfoLog(ShaderProgramID, 512, NULL, ErrorInfo);
+
+		if (logLenght > 0)
+		{
+			std::cout << "LINK ERROR: \n" << ErrorInfo << std::endl;
+		}
+
+		delete[] ErrorInfo;
 	}
 
 	glDeleteShader(ShaderT);
-
-
-
 };
 
 void ShaderProgram::Use()
