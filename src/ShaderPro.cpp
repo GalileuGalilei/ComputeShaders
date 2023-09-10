@@ -6,13 +6,13 @@
 
 
 //shaders
-char** ShaderSource(const char* Path)
+char** ShaderSource(const char* Path, GLint& lenght)
 {
 	std::ifstream FileSource(Path);
 	if (FileSource.is_open())
 	{
 		FileSource.seekg(0, FileSource.end);
-		long long lenght = FileSource.tellg();
+		lenght = FileSource.tellg();
 		FileSource.seekg(0, FileSource.beg);
 
 		char* CharFile = new char[lenght + 1]{ NULL };
@@ -40,8 +40,9 @@ ShaderProgram::ShaderProgram()
 void ShaderProgram::CreateShader(GLenum ShaderType, const char* Path)
 {
 	GLuint ShaderT = glCreateShader(ShaderType);
-	char** source = ShaderSource(Path);
-	glShaderSource(ShaderT, 1, source, NULL);
+	GLint lenght;
+	char** source = ShaderSource(Path, lenght);
+	glShaderSource(ShaderT, 1, source, &lenght);
 	glCompileShader(ShaderT);
 
 	int sucesso;

@@ -1,9 +1,9 @@
 #include "Mesh.h"
 #include <iostream>
 
-void Mesh::AddVerticesAttribute(int index, std::vector<float> data, int size)
+void Mesh::AddVerticesAttribute(int index, std::vector<float> data, int count)
 {
-	if (vertices.size() != data.size() / size && vertices.size() != 0)
+	if (vertices.size() != data.size() / count && vertices.size() != 0)
 	{
 		std::cout << "ERROR: each vertex attribute must be equal to the number of vertices" << std::endl;
 		return;
@@ -11,12 +11,12 @@ void Mesh::AddVerticesAttribute(int index, std::vector<float> data, int size)
 
 	for (int i = 0; i < data.size(); i++)
 	{
-		vertices[i / size].push_back(data[i]);
+		vertices[i / count].push_back(data[i]);
 	}
 
 	attributesOffset[index] = stride;
-	attributesSize[index] = size;
-	stride += size;
+	attributesSize[index] = count * sizeof(float);
+	stride += count;
 	attributes++;
 }
 
@@ -65,13 +65,13 @@ void Mesh::CreateBuffers()
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
 
-	glBindVertexArray(VBO);
+	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
 	int size;
 	float* data = GetBufferData(size);
 	
-	glBufferData(VBO, size, data, GL_STATIC_DRAW);
+	glBufferData(VBO, size * sizeof(float), data, GL_STATIC_DRAW);
 	
 	for (int i = 0; i < attributes; i++)
 	{
@@ -80,11 +80,10 @@ void Mesh::CreateBuffers()
 	}
 	
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 	
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 void Mesh::DeleteMesh()
@@ -95,10 +94,11 @@ void Mesh::DeleteMesh()
 
 	vertices.clear();
 	indices.clear();
+	attributesOffset.clear();
 }
 
 void Mesh::DrawMesh()
 {
 	Bind();
-	//glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 }

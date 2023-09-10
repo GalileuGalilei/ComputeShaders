@@ -9,9 +9,6 @@
 #define PI 3.14159265358979
 #define MARGINS 0.6
 
-
-double yaw = -PI * 0.5, pitch; //yaw = 360° e pitch = cima/baixo
-
 int window_width = 720;
 int window_heigh = 480;
 float lastX = window_width * 0.5f;
@@ -65,83 +62,6 @@ float mod(float a, float b)
 
 #pragma region Callbacks
 
-void OnKeyboardInput(GLFWwindow* window)
-{
-	
-	if (glfwGetKey(window, GLFW_KEY_W))
-	{
-		camera_position += camera_direction * 0.5f;
-		camera_target += camera_direction * 0.5f;
-	}
-	
-	if (glfwGetKey(window, GLFW_KEY_S))
-	{
-		camera_position -= camera_direction * 0.5f;
-		camera_target -= camera_direction * 0.5f;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_A))
-	{
-		camera_position -= camera_x_axis * 0.5f;
-		camera_target -= camera_x_axis * 0.5f;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_D))
-	{
-		camera_position += camera_x_axis * 0.5f;
-		camera_target += camera_x_axis * 0.5f;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_SPACE))
-	{
-		camera_position.y += 0.5f;
-		camera_target.y += 0.5f;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT))
-	{
-		camera_position.y -= 0.5f;
-		camera_target.y -= 0.5f;
-	}
-
-	camera_direction = glm::normalize(camera_target - camera_position); 
-	camera_x_axis = glm::cross(camera_direction, glm::vec3(0.0f, 1.0f, 0.0f));
-	camera_y_axis = glm::cross(camera_direction, camera_x_axis);
-}
-
-void OnMouseInput(GLFWwindow* window, double xpos, double ypos)
-{
-	if (first_mouse)
-	{
-		first_mouse = false;
-		xpos = lastX;
-		ypos = lastY;
-	}
-
-	float offsetX = xpos - lastX;
-	float offsetY = lastY - ypos;
-
-	lastX = xpos;
-	lastY = ypos;
-
-	yaw += offsetX * 0.002;
-	pitch += offsetY * 0.002;
-
-	if (pitch > PI*0.4f)
-	{
-		pitch = PI * 0.4f;
-	}
-	if (pitch < -PI * 0.4f)
-	{
-		pitch = -PI * 0.4f;
-	}
-
-	camera_target.x = cos(yaw)*cos(pitch);
-	camera_target.y = sin(pitch);
-	camera_target.z = sin(yaw) * cos(pitch);
-	camera_target += camera_position;
-}
-
 void OnWindowResize(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
@@ -161,7 +81,7 @@ void InitGladAndGLFW()
 
 	window = glfwCreateWindow(window_width, window_heigh, "JANELA", NULL, NULL);
 	glfwMakeContextCurrent(window);
-	glfwSetCursorPosCallback(window, OnMouseInput);
+	//glfwSetCursorPosCallback(window, OnMouseInput);
 	glfwSetFramebufferSizeCallback(window, OnWindowResize);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -198,17 +118,12 @@ int main()
 
 		Mesh* mesh = new Mesh();
 		mesh->AddVerticesAttribute(0, squarePosition, 3);
-		mesh->AddVerticesAttribute(1, squareTexture, 2);
+		//mesh->AddVerticesAttribute(1, squareTexture, 2);
 		mesh->AddIndices(SquareIndice);
 		
 		//transformations
-		glm::mat4 model_matrix(1.0f);
-		glm::mat4 view_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
-		glm::mat4 projection_matrix = glm::perspective((float)PI / 4, (float)window_width / window_heigh, 0.1f, 300.0f);
-
+		glm::mat4 model_matrix(4.0f);
 		int model_location = glGetUniformLocation(SHADER.ShaderProgramID, "model");
-		int view_location = glGetUniformLocation(SHADER.ShaderProgramID, "view");
-		int projection_location = glGetUniformLocation(SHADER.ShaderProgramID, "projection");
 
 
 	//Update loop
@@ -220,10 +135,6 @@ int main()
 			glfwSetWindowShouldClose(window, true);
 		}
 
-		OnKeyboardInput(window);
-		
-
-
 		//background_color
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearColor(0.75f, 0.23f, 0.46f, 1.0f);
@@ -233,18 +144,7 @@ int main()
 		SHADER.Use();
 
 		//updating
-
-		view_matrix = glm::lookAt
-		(
-			camera_position,
-			camera_target,
-			glm::vec3(0.0f,1.0f,0.0f)
-		);
-		
-
 		glUniformMatrix4fv(model_location, 1, false, glm::value_ptr(model_matrix));
-		glUniformMatrix4fv(view_location, 1, false, glm::value_ptr(view_matrix));
-		glUniformMatrix4fv(projection_location, 1, false, glm::value_ptr(projection_matrix));
 
 
 		//drawing
