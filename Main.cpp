@@ -19,10 +19,10 @@ GLFWwindow* window;
 
 std::vector<float> squarePosition =
 {          
-	-0.5f, 0.5f, 0.0f,	//0
-	-0.5f, -0.5f, 0.0f, //1
-	0.5f, -0.5f, 0.0f,	//2
-	0.5f, 0.5f, 0.0f	//3
+	-0.5f, 0.5f, 0.0f,
+	0.5f, 0.5f, 0.0f,
+	-0.5f, -0.5f, 0.0f,
+	0.5f, -0.5f, 0.0f  
 };
 
 std::vector<float> squareTexture =
@@ -83,7 +83,7 @@ void InitGladAndGLFW()
 	glfwMakeContextCurrent(window);
 	//glfwSetCursorPosCallback(window, OnMouseInput);
 	glfwSetFramebufferSizeCallback(window, OnWindowResize);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
@@ -118,11 +118,11 @@ int main()
 
 		Mesh* mesh = new Mesh();
 		mesh->AddVerticesAttribute(0, squarePosition, 3);
-		//mesh->AddVerticesAttribute(1, squareTexture, 2);
+		mesh->AddVerticesAttribute(1, squareTexture, 2);
 		mesh->AddIndices(SquareIndice);
 		
 		//transformations
-		glm::mat4 model_matrix(4.0f);
+		glm::mat4 model_matrix(1.0f);
 		int model_location = glGetUniformLocation(SHADER.ShaderProgramID, "model");
 
 

@@ -15,7 +15,7 @@ void Mesh::AddVerticesAttribute(int index, std::vector<float> data, int count)
 	}
 
 	attributesOffset[index] = stride;
-	attributesSize[index] = count * sizeof(float);
+	attributesSize[index] = count;
 	stride += count;
 	attributes++;
 }
@@ -71,7 +71,7 @@ void Mesh::CreateBuffers()
 	int size;
 	float* data = GetBufferData(size);
 	
-	glBufferData(VBO, size * sizeof(float), data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, size * sizeof(float), data, GL_STATIC_DRAW);
 	
 	for (int i = 0; i < attributes; i++)
 	{
