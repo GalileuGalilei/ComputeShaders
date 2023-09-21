@@ -8,6 +8,9 @@ public:
 	Texture(const char* filename, bool mipmap);
 	~Texture();
 
+	int width;
+	int height;
+
 	void Bind();
 	void Unbind();
 	int Id();

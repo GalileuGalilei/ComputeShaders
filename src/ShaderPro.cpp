@@ -27,7 +27,6 @@ char** ShaderSource(const char* Path, GLint& lenght)
 	{
 		std::cout << "erro ao abrir arquivo :(";
 	}
-
 };
 
 
@@ -64,7 +63,7 @@ void ShaderProgram::CreateShader(GLenum ShaderType, const char* Path)
 
 		delete[] ErrorInfo;
 	}
-
+	
 	glAttachShader(ShaderProgramID, ShaderT);
 	glLinkProgram(ShaderProgramID);
 
@@ -89,28 +88,102 @@ void ShaderProgram::CreateShader(GLenum ShaderType, const char* Path)
 	glDeleteShader(ShaderT);
 };
 
+void ShaderProgram::CreateComputeShader(const char* Name, const char* Path)
+{
+	GLuint ComputeProgramID = glCreateProgram();
+	computeShaderKernerls[Name] = ComputeProgramID;
+
+	GLuint ShaderT = glCreateShader(GL_COMPUTE_SHADER);
+	GLint lenght;
+	char** source = ShaderSource(Path, lenght);
+	glShaderSource(ShaderT, 1, source, &lenght);
+	glCompileShader(ShaderT);
+
+	int sucesso;
+	char* ErrorInfo;
+	glGetShaderiv(ShaderT, GL_COMPILE_STATUS, &sucesso);
+
+	if (!sucesso)
+	{
+		int logLenght;
+		glGetShaderiv(ShaderT, GL_INFO_LOG_LENGTH, &logLenght);
+		ErrorInfo = new char[logLenght + 1];
+
+		glGetShaderInfoLog(ShaderT, logLenght, NULL, ErrorInfo);
+
+		if (logLenght > 0)
+		{
+			std::cout << "GLSL ERROR: \n" << ErrorInfo << std::endl;
+		}
+
+		delete[] ErrorInfo;
+	}
+
+	glAttachShader(ComputeProgramID, ShaderT);
+	glLinkProgram(ComputeProgramID);
+
+	glGetProgramiv(ComputeProgramID, GL_LINK_STATUS, &sucesso);
+
+	if (!sucesso)
+	{
+		int logLenght;
+		glGetProgramiv(ComputeProgramID, GL_INFO_LOG_LENGTH, &logLenght);
+		ErrorInfo = new char[logLenght + 1];
+
+		glGetProgramInfoLog(ShaderProgramID, 512, NULL, ErrorInfo);
+
+		if (logLenght > 0)
+		{
+			std::cout << "LINK ERROR: \n" << ErrorInfo << std::endl;
+		}
+
+		delete[] ErrorInfo;
+	}
+
+	glDeleteShader(ShaderT);
+}
+
 void ShaderProgram::Use()
 {
 	glUseProgram(ShaderProgramID);
 }
 
+void ShaderProgram::DispatchComputeShader(const char* Name, unsigned int x, unsigned int y, unsigned int z)
+{
+	glUseProgram(computeShaderKernerls[Name]);
+	glDispatchCompute(x, y, z);
+}
+
 void ShaderProgram::Delete()
 {
 	glDeleteProgram(ShaderProgramID);
+
+	for (auto compute : computeShaderKernerls)
+	{
+		glDeleteProgram(compute.second);
+	}
 }
 
 void ShaderProgram::SetTexture(Texture* tex, const char* sampler)
 {
 	tex->Bind();
-	glUniform1i(glGetUniformLocation(ShaderProgramID, sampler), texturesBinds.size());
+	GLuint location = glGetUniformLocation(ShaderProgramID, sampler);
+	glUniform1i(location, texturesBinds.size());
+
+	for (auto compute : computeShaderKernerls)
+	{
+		GLuint location = glGetUniformLocation(compute.second, sampler);
+		glUniform1i(location, texturesBinds.size());
+	}
+
 	texturesBinds.insert(std::pair<unsigned int, unsigned int>(texturesBinds.size(), tex->Id()));
 	tex->Unbind();
 }
 
 void ShaderProgram::ActivateTexture(Texture* tex)
 {
+	glActiveTexture(texturesBinds[tex->Id()] + GL_TEXTURE0);
 	tex->Bind();
-	glActiveTexture(texturesBinds[tex->Id()]);
 }
 
 

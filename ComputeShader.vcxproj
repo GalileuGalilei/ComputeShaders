@@ -171,6 +171,7 @@
     <ClInclude Include="include\Mesh.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\displace.glsl" />
     <None Include="shaders\FragmentShader.glsl" />
     <None Include="shaders\VertexShader.glsl" />
   </ItemGroup>

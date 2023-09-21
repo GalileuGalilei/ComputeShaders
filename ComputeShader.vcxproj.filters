@@ -63,6 +63,7 @@
   <ItemGroup>
     <None Include="shaders\VertexShader.glsl" />
     <None Include="shaders\FragmentShader.glsl" />
+    <None Include="shaders\displace.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="glfw\glfw3.lib" />

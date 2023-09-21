@@ -15,16 +15,20 @@ Texture::Texture(const char* filename, bool mipmap)
 		return;
 	}
 
+	//image_data = nullptr;
 	glGenTextures(1, &textureId);
 	glBindTexture(GL_TEXTURE_2D, textureId);
 
 	//default parameters
-	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image_width, image_heigh, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, image_width, image_heigh, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, image_width, image_heigh, 0, GL_RGBA, GL_FLOAT, NULL);
+
+	glBindTexture(GL_TEXTURE_2D, textureId);
 	
 	if (mipmap)
 	{
@@ -32,7 +36,11 @@ Texture::Texture(const char* filename, bool mipmap)
 	}
 	
 	glBindTexture(GL_TEXTURE_2D, 0);
+
 	stbi_image_free(image_data);
+
+	width = image_width;
+	height = image_heigh;
 }
 
 Texture::~Texture()
@@ -42,12 +50,14 @@ Texture::~Texture()
 
 void Texture::Bind()
 {
+	glBindImageTexture(0, textureId, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
 	glBindTexture(GL_TEXTURE_2D, textureId);
 }
 
 void Texture::Unbind()
 {
 	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindImageTexture(0, 0, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
 }
 
 int Texture::Id()
