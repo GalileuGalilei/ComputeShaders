@@ -9,8 +9,8 @@
 #define PI 3.14159265358979
 #define MARGINS 0.6
 
-int window_width = 800;
-int window_heigh = 800;
+int window_width = 1000;
+int window_heigh = 1000;
 float lastX = window_width * 0.5f;
 float lastY = window_heigh * 0.5f;
 bool first_mouse = true;
@@ -79,6 +79,35 @@ void OnWindowResize(GLFWwindow* window, int width, int height)
 	projection_matrix *= aux;
 }
 
+void OnMouseInput(GLFWwindow* window, double xpos, double ypos)
+{
+	if (first_mouse)
+	{
+		lastX = xpos;
+		lastY = ypos;
+		first_mouse = false;
+	}
+
+	float xoffset = xpos - lastX;
+	float yoffset = lastY - ypos;
+
+	lastX = xpos;
+	lastY = ypos;
+
+	float sensitivity = 0.05f;
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
+
+	camera_direction = glm::normalize(camera_position - camera_target);
+	camera_x_axis = glm::cross(camera_direction, glm::vec3(0.0f, 1.0f, 0.0f));
+	camera_y_axis = glm::cross(camera_direction, camera_x_axis);
+
+	camera_position += camera_x_axis * xoffset + camera_y_axis * yoffset;
+	camera_target += camera_x_axis * xoffset + camera_y_axis * yoffset;
+}
+
+void OnKeyInput(GLFWwindow* window, int, int, int, int);
+
 #pragma endregion
 
 void InitGladAndGLFW()
@@ -90,7 +119,9 @@ void InitGladAndGLFW()
 
 	window = glfwCreateWindow(window_width, window_heigh, "JANELA", NULL, NULL);
 	glfwMakeContextCurrent(window);
-	//glfwSetCursorPosCallback(window, OnMouseInput);
+	glfwSetCursorPosCallback(window, OnMouseInput);
+	glfwSetKeyCallback(window, OnKeyInput);
+
 	glfwSetFramebufferSizeCallback(window, OnWindowResize);
 	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -106,8 +137,8 @@ void InitOpenGL()
 	glEnable(GL_DEPTH_TEST);
 
 	//errors
-	glEnable(GL_DEBUG_OUTPUT);
-	glDebugMessageCallback(MessageCallback, 0);
+	//glEnable(GL_DEBUG_OUTPUT);
+	//glDebugMessageCallback(MessageCallback, 0);
 
 	//Viewport
 	glViewport(0, 0, window_width, window_heigh);
@@ -127,7 +158,7 @@ int main()
 		SHADER.Use();
 
 		//texture to shader
-		Texture* tex = new Texture("metal.jpg", false);
+		RenderTexture* tex = new RenderTexture(window_width, window_heigh, GL_RGBA32F);
 		SHADER.SetTexture(tex, "Texture0");
 
 		Mesh* mesh = new Mesh();
@@ -138,7 +169,6 @@ int main()
 		//transformations
 		glm::mat4 model_matrix(1.0f);
 		int model_location = glGetUniformLocation(SHADER.ShaderProgramID, "model");
-		float iteration = 0;
 
 	//Update loop
 	while (!glfwWindowShouldClose(window))
@@ -153,12 +183,7 @@ int main()
 		glClearColor(0.75f, 0.23f, 0.46f, 1.0f);
 
 		//binding all
-		SHADER.SetUniform1f("iteration", iteration);
 		SHADER.ActivateTexture(tex);
-
-		SHADER.DispatchComputeShader("displace", tex->width, tex->height, 1);
-		
-		//glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
 		GLenum err = glGetError();
 
@@ -177,9 +202,9 @@ int main()
 		mesh->DrawMesh();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-		iteration += 0.00001f;
 	}
 
+	tex->SaveToFile("texte.png");
 	mesh->DeleteMesh();
 	SHADER.Delete();
 	glfwTerminate();

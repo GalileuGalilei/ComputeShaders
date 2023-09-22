@@ -120,9 +120,11 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)\glfw\include;$(SolutionDir)include</AdditionalIncludeDirectories>
+      <UseStandardPreprocessor>
+      </UseStandardPreprocessor>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -167,6 +169,7 @@
     <ClInclude Include="glfw\include\glad\glad.h" />
     <ClInclude Include="include\ShadersPro.h" />
     <ClInclude Include="include\stb_image.h" />
+    <ClInclude Include="include\stb_image_write.h" />
     <ClInclude Include="include\Texture.h" />
     <ClInclude Include="include\Mesh.h" />
   </ItemGroup>

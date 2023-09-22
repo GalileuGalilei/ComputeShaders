@@ -25,12 +25,13 @@ void main()
 
     vec2 z = vec2(0,0);
     vec2 c = coord;
-    float step = 0.00001;
+    float step = 0.0001;
 
     if(iteration < step)
     {
         bool isMandelbroth = true;
-        for (int i=0; i < 300; i++) 
+        int i;
+        for (i=0; i < 200; i++) 
         {
             z = complexSquare(z) + c;
             if (length(z) > 100) 
@@ -42,28 +43,7 @@ void main()
 
         if(!isMandelbroth)
         {
-            imageStore(Texture0, texelCoord, vec4(0, iteration + step, c.x, c.y));
+            imageStore(Texture0, texelCoord, vec4(float(i) / 200., 0, c.x, c.y));
         }
-
-        return;       
     }
-    
-    if(fragColor.y < iteration)
-    {
-        return;
-    }
-
-    c = fragColor.zw;
-    z = complexSquare(coord) + c;
-        
-    vec2 newCoord = vec2(z.x/zoom + 0.5, z.y/zoom + 0.5);
-    ivec2 newTexelCoord;
-    newTexelCoord.x = int(gl_NumWorkGroups.x * newCoord.x);
-    newTexelCoord.y = int(gl_NumWorkGroups.y * newCoord.y);
-
-    fragColor.x += 0.003;
-    fragColor.y = iteration + step;
-    fragColor.z = c.x;
-    fragColor.w = c.y;
-    imageStore(Texture0, newTexelCoord, fragColor);
 }

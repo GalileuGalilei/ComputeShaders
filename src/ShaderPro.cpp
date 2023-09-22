@@ -91,7 +91,7 @@ void ShaderProgram::CreateShader(GLenum ShaderType, const char* Path)
 void ShaderProgram::CreateComputeShader(const char* Name, const char* Path)
 {
 	GLuint ComputeProgramID = glCreateProgram();
-	computeShaderKernerls[Name] = ComputeProgramID;
+	computeShaderPrograms[Name] = ComputeProgramID;
 
 	GLuint ShaderT = glCreateShader(GL_COMPUTE_SHADER);
 	GLint lenght;
@@ -150,7 +150,7 @@ void ShaderProgram::Use()
 
 void ShaderProgram::DispatchComputeShader(const char* Name, unsigned int x, unsigned int y, unsigned int z)
 {
-	glUseProgram(computeShaderKernerls[Name]);
+	glUseProgram(computeShaderPrograms[Name]);
 	glDispatchCompute(x, y, z);
 }
 
@@ -158,7 +158,7 @@ void ShaderProgram::Delete()
 {
 	glDeleteProgram(ShaderProgramID);
 
-	for (auto compute : computeShaderKernerls)
+	for (auto compute : computeShaderPrograms)
 	{
 		glDeleteProgram(compute.second);
 	}
@@ -170,7 +170,7 @@ void ShaderProgram::SetTexture(Texture* tex, const char* sampler)
 	GLuint location = glGetUniformLocation(ShaderProgramID, sampler);
 	glUniform1i(location, texturesBinds.size());
 
-	for (auto compute : computeShaderKernerls)
+	for (auto compute : computeShaderPrograms)
 	{
 		GLuint location = glGetUniformLocation(compute.second, sampler);
 		glUniform1i(location, texturesBinds.size());
@@ -180,31 +180,16 @@ void ShaderProgram::SetTexture(Texture* tex, const char* sampler)
 	tex->Unbind();
 }
 
-void ShaderProgram::SetUniform1i(const char* Name, GLint value)
+GLuint ShaderProgram::GetUniformLocation(const char* Name)
 {
-	glUseProgram(ShaderProgramID);
 	GLuint location = glGetUniformLocation(ShaderProgramID, Name);
-	glUniform1i(location, value);
-
-	for (auto compute : computeShaderKernerls)
-	{
-		glUseProgram(compute.second);
-		GLuint location = glGetUniformLocation(compute.second, Name);
-		glUniform1i(location, value);
-	}
+	return location;
 }
 
-void ShaderProgram::SetUniform1f(const char* Name, GLfloat value)
+GLuint ShaderProgram::GetUniformLocation(const char* Name, const char* computeShaderName)
 {
-	glUseProgram(ShaderProgramID);
-	GLuint location = glGetUniformLocation(ShaderProgramID, Name);
-	glUniform1f(location, value);
-	for (auto compute : computeShaderKernerls)
-	{
-		glUseProgram(compute.second);
-		GLuint location = glGetUniformLocation(compute.second, Name);
-		glUniform1f(location, value);
-	}
+	GLuint location = glGetUniformLocation(computeShaderPrograms[computeShaderName], Name);
+	return location;
 }
 
 void ShaderProgram::ActivateTexture(Texture* tex)

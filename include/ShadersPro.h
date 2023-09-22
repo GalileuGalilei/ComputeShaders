@@ -7,7 +7,7 @@ class ShaderProgram
 {
 private:
 	std::map<unsigned int, unsigned int> texturesBinds;
-	std::map<std::string, unsigned int> computeShaderKernerls;
+	std::map<std::string, unsigned int> computeShaderPrograms;
 
 public:
 	unsigned int ShaderProgramID;
@@ -18,8 +18,8 @@ public:
 
 	void SetTexture(Texture* tex, const char* sampler);
 	void ActivateTexture(Texture* tex);
-	void SetUniform1i(const char* Name, GLint value);
-	void SetUniform1f(const char* Name, GLfloat value);
+	GLuint GetUniformLocation(const char* name);
+	GLuint GetUniformLocation(const char* name, const char* computeShaderName);
 	
 	void Use();
 	void DispatchComputeShader(const char* Name, unsigned int NumGroupsX​, unsigned int NumGroupsY, unsigned int NumGroupsZ);
