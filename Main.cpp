@@ -9,8 +9,8 @@
 #define PI 3.14159265358979
 #define MARGINS 0.6
 
-int window_width = 512;
-int window_heigh = 512;
+int window_width = 800;
+int window_heigh = 800;
 float lastX = window_width * 0.5f;
 float lastY = window_heigh * 0.5f;
 bool first_mouse = true;
@@ -106,13 +106,12 @@ void InitOpenGL()
 	glEnable(GL_DEPTH_TEST);
 
 	//errors
-	//glEnable(GL_DEBUG_OUTPUT);
-	//glDebugMessageCallback(MessageCallback, 0);
+	glEnable(GL_DEBUG_OUTPUT);
+	glDebugMessageCallback(MessageCallback, 0);
 
 	//Viewport
 	glViewport(0, 0, window_width, window_heigh);
 }
-
 
 int main()
 {
@@ -139,8 +138,7 @@ int main()
 		//transformations
 		glm::mat4 model_matrix(1.0f);
 		int model_location = glGetUniformLocation(SHADER.ShaderProgramID, "model");
-
-
+		float iteration = 0;
 
 	//Update loop
 	while (!glfwWindowShouldClose(window))
@@ -155,9 +153,12 @@ int main()
 		glClearColor(0.75f, 0.23f, 0.46f, 1.0f);
 
 		//binding all
+		SHADER.SetUniform1f("iteration", iteration);
 		SHADER.ActivateTexture(tex);
+
 		SHADER.DispatchComputeShader("displace", tex->width, tex->height, 1);
-		glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+		
+		//glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
 		GLenum err = glGetError();
 
@@ -176,6 +177,7 @@ int main()
 		mesh->DrawMesh();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+		iteration += 0.00001f;
 	}
 
 	mesh->DeleteMesh();

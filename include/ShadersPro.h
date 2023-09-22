@@ -18,6 +18,8 @@ public:
 
 	void SetTexture(Texture* tex, const char* sampler);
 	void ActivateTexture(Texture* tex);
+	void SetUniform1i(const char* Name, GLint value);
+	void SetUniform1f(const char* Name, GLfloat value);
 	
 	void Use();
 	void DispatchComputeShader(const char* Name, unsigned int NumGroupsX​, unsigned int NumGroupsY, unsigned int NumGroupsZ);

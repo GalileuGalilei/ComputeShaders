@@ -15,6 +15,8 @@ Texture::Texture(const char* filename, bool mipmap)
 		return;
 	}
 
+	image_width = 1024, image_heigh = 1024;
+
 	//image_data = nullptr;
 	glGenTextures(1, &textureId);
 	glBindTexture(GL_TEXTURE_2D, textureId);

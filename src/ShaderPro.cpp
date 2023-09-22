@@ -180,6 +180,33 @@ void ShaderProgram::SetTexture(Texture* tex, const char* sampler)
 	tex->Unbind();
 }
 
+void ShaderProgram::SetUniform1i(const char* Name, GLint value)
+{
+	glUseProgram(ShaderProgramID);
+	GLuint location = glGetUniformLocation(ShaderProgramID, Name);
+	glUniform1i(location, value);
+
+	for (auto compute : computeShaderKernerls)
+	{
+		glUseProgram(compute.second);
+		GLuint location = glGetUniformLocation(compute.second, Name);
+		glUniform1i(location, value);
+	}
+}
+
+void ShaderProgram::SetUniform1f(const char* Name, GLfloat value)
+{
+	glUseProgram(ShaderProgramID);
+	GLuint location = glGetUniformLocation(ShaderProgramID, Name);
+	glUniform1f(location, value);
+	for (auto compute : computeShaderKernerls)
+	{
+		glUseProgram(compute.second);
+		GLuint location = glGetUniformLocation(compute.second, Name);
+		glUniform1f(location, value);
+	}
+}
+
 void ShaderProgram::ActivateTexture(Texture* tex)
 {
 	glActiveTexture(texturesBinds[tex->Id()] + GL_TEXTURE0);
