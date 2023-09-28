@@ -2,18 +2,15 @@
 #include "GLFW/glfw3.h"
 #include "iostream"
 #include "ShadersPro.h"
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
 #include "Mesh.h"
+#include "Camera.h"
 #include "glm/gtc/type_ptr.hpp"
 #define PI 3.14159265358979
 #define MARGINS 0.6
 
-int window_width = 1000;
-int window_heigh = 1000;
-float lastX = window_width * 0.5f;
-float lastY = window_heigh * 0.5f;
-bool first_mouse = true;
+int window_width = 720;
+int window_heigh = 720;
+Camera cam(window_width, window_heigh);
 GLFWwindow* window;
 
 
@@ -40,13 +37,6 @@ std::vector<GLuint> SquareIndice =
 	3,2,1  //triangle
 };
 
-glm::vec3 camera_position(0.0f, 0.0f, 3.0f);
-glm::vec3 camera_target(0.0f, 0.0f, -1.0f);
-
-glm::vec3 camera_direction = glm::normalize(camera_position - camera_target); //sentido inverso
-glm::vec3 camera_x_axis = glm::cross(camera_direction, glm::vec3(0.0f, 1.0f, 0.0f));
-glm::vec3 camera_y_axis = glm::cross(camera_direction, camera_x_axis);
-
 float mod(float a, float b)
 {
 
@@ -68,45 +58,26 @@ void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum se
 	fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, source = 0x%x, message = %s\n",
 		(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
 		type, severity, source, message);
-	
 }
 
 void OnWindowResize(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
-	glm::mat4 projection_matrix = glm::perspective((float)PI / 4, (float)width / height, 0.1f, 300.0f);
-	glm::mat4 aux = glm::mat4(MARGINS);
-	projection_matrix *= aux;
+	cam.OnWindowResize(width, height);
 }
 
 void OnMouseInput(GLFWwindow* window, double xpos, double ypos)
 {
-	if (first_mouse)
-	{
-		lastX = xpos;
-		lastY = ypos;
-		first_mouse = false;
-	}
-
-	float xoffset = xpos - lastX;
-	float yoffset = lastY - ypos;
-
-	lastX = xpos;
-	lastY = ypos;
-
-	float sensitivity = 0.05f;
-	xoffset *= sensitivity;
-	yoffset *= sensitivity;
-
-	camera_direction = glm::normalize(camera_position - camera_target);
-	camera_x_axis = glm::cross(camera_direction, glm::vec3(0.0f, 1.0f, 0.0f));
-	camera_y_axis = glm::cross(camera_direction, camera_x_axis);
-
-	camera_position += camera_x_axis * xoffset + camera_y_axis * yoffset;
-	camera_target += camera_x_axis * xoffset + camera_y_axis * yoffset;
+	cam.OnMouseInput(xpos, ypos);
 }
 
-void OnKeyInput(GLFWwindow* window, int, int, int, int);
+void OnKeyInput(GLFWwindow* window, int, int, int, int)
+{
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	{
+		glfwSetWindowShouldClose(window, true);
+	}
+}
 
 #pragma endregion
 
@@ -158,7 +129,7 @@ int main()
 		SHADER.Use();
 
 		//texture to shader
-		RenderTexture* tex = new RenderTexture(window_width, window_heigh, GL_RGBA32F);
+		Texture* tex = new Texture("metal.jpg", true, GL_RGBA32F);
 		SHADER.SetTexture(tex, "Texture0");
 
 		Mesh* mesh = new Mesh();
@@ -184,13 +155,9 @@ int main()
 
 		//binding all
 		SHADER.ActivateTexture(tex);
-
 		GLenum err = glGetError();
 
-		//printa o erro
 
-
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		SHADER.Use();
 
@@ -202,9 +169,9 @@ int main()
 		mesh->DrawMesh();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
-	tex->SaveToFile("texte.png");
 	mesh->DeleteMesh();
 	SHADER.Delete();
 	glfwTerminate();

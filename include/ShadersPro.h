@@ -2,6 +2,8 @@
 #define SHADER_H
 #include <map>
 #include "Texture.h"
+#include <string>
+#include <glad/glad.h>
 
 class ShaderProgram
 {
