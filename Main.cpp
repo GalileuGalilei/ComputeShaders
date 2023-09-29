@@ -8,8 +8,8 @@
 #define PI 3.14159265358979
 #define MARGINS 0.6
 
-int window_width = 720;
-int window_heigh = 720;
+int window_width = 520;
+int window_heigh = 520;
 Camera cam(window_width, window_heigh);
 GLFWwindow* window;
 
@@ -139,7 +139,7 @@ int main()
 		
 		//transformations
 		glm::mat4 model_matrix(1.0f);
-		int model_location = glGetUniformLocation(SHADER.ShaderProgramID, "model");
+		int model_location = glGetUniformLocation(SHADER.ShaderProgramID, "model_matrix");
 
 	//Update loop
 	while (!glfwWindowShouldClose(window))
@@ -154,6 +154,7 @@ int main()
 		glClearColor(0.75f, 0.23f, 0.46f, 1.0f);
 
 		//binding all
+		cam.SetMatrices(&SHADER);
 		SHADER.ActivateTexture(tex);
 		GLenum err = glGetError();
 

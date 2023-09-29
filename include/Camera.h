@@ -15,7 +15,7 @@ private:
 	bool first_mouse = true;
 	float lastX = 0.0f;
 	float lastY = 0.0f;
-	float sensitivity = 0.05f;
+	float sensitivity = 0.1f;
 
 	int screen_width = 800;
 	int screen_height = 600;

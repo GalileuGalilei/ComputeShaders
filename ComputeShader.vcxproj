@@ -153,7 +153,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="camera\cam.cpp" />
     <ClCompile Include="GLAD\src\glad.c" />
     <ClCompile Include="src\Mesh.cpp" />
@@ -165,7 +165,7 @@
     <ClCompile Include="src\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h" />
+    <ClInclude Include="include\Camera.h" />
     <ClInclude Include="camera\cam.h" />
     <ClInclude Include="GLAD\include\glad\glad.h" />
     <ClInclude Include="glfw\include\glad\glad.h" />
