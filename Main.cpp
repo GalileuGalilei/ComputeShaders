@@ -5,14 +5,13 @@
 #include "Mesh.h"
 #include "Camera.h"
 #include "glm/gtc/type_ptr.hpp"
-#define PI 3.14159265358979
-#define MARGINS 0.6
 
 int window_width = 520;
 int window_heigh = 520;
 Camera cam(window_width, window_heigh);
 GLFWwindow* window;
 
+#pragma region vertices_vectors
 
 std::vector<float> squarePosition =
 {          
@@ -37,19 +36,7 @@ std::vector<GLuint> SquareIndice =
 	3,2,1  //triangle
 };
 
-float mod(float a, float b)
-{
-
-	if (abs(a) > abs(b))
-	{
-		return b;
-	}
-
-	int aux = (int)b / a;
-	b -= aux * a;
-
-	return b;
-}
+#pragma endregion
 
 #pragma region Callbacks
 
@@ -94,7 +81,7 @@ void InitGladAndGLFW()
 	glfwSetKeyCallback(window, OnKeyInput);
 
 	glfwSetFramebufferSizeCallback(window, OnWindowResize);
-	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
@@ -120,57 +107,49 @@ int main()
 	InitGladAndGLFW();
 	InitOpenGL();		
 
-	//Shaders creation
-		ShaderProgram SHADER;
+	ShaderProgram SHADER;
 	
-		SHADER.CreateShader(GL_VERTEX_SHADER, "shaders/VertexShader.glsl");
-		SHADER.CreateShader(GL_FRAGMENT_SHADER, "shaders/FragmentShader.glsl");
-		SHADER.CreateComputeShader("displace", "shaders/displace.glsl");
-		SHADER.Use();
+	SHADER.CreateShader(GL_VERTEX_SHADER, "shaders/VertexShader.glsl");
+	SHADER.CreateShader(GL_FRAGMENT_SHADER, "shaders/FragmentShader.glsl");
+	SHADER.CreateComputeShader("displace", "shaders/displace.glsl");
+	SHADER.Use();
 
-		//texture to shader
-		Texture* tex = new Texture("metal.jpg", true, GL_RGBA32F);
-		SHADER.SetTexture(tex, "Texture0");
+	//textures
+	Texture* tex = new Texture("metal.jpg", true, GL_RGBA32F);
+	SHADER.SetTexture(tex, "Texture0");
 
-		Mesh* mesh = new Mesh();
-		mesh->AddVerticesAttribute(0, squarePosition, 3);
-		mesh->AddVerticesAttribute(1, squareTexture, 2);
-		mesh->AddIndices(SquareIndice);
+	//vertices
+	Mesh* mesh = new Mesh();
+	mesh->AddVerticesAttribute(0, squarePosition, 3);
+	mesh->AddVerticesAttribute(1, squareTexture, 2);
+	mesh->AddIndices(SquareIndice);
 		
-		//transformations
-		glm::mat4 model_matrix(1.0f);
-		int model_location = glGetUniformLocation(SHADER.ShaderProgramID, "model_matrix");
+	//transformations
+	glm::mat4 model_matrix(1.0f);
+	int model_location = glGetUniformLocation(SHADER.ShaderProgramID, "model_matrix");
 
 	//Update loop
 	while (!glfwWindowShouldClose(window))
 	{
-		//input
-		if (glfwGetKey(window, GLFW_KEY_ESCAPE))
-		{
-			glfwSetWindowShouldClose(window, true);
-		}
-
 		//background_color
 		glClearColor(0.75f, 0.23f, 0.46f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//binding all
+		//camera inputs
+		cam.OnKeyInput(window);
 		cam.SetMatrices(&SHADER);
+		
+		//binding all
 		SHADER.ActivateTexture(tex);
-		GLenum err = glGetError();
-
-
-
 		SHADER.Use();
 
-
-		//updating
+		//models uniforms
 		glUniformMatrix4fv(model_location, 1, false, glm::value_ptr(model_matrix));
 
 		//drawing
 		mesh->DrawMesh();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
 	mesh->DeleteMesh();

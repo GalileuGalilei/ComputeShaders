@@ -1,6 +1,7 @@
 #pragma once
 #include <glm/glm.hpp>
 #include "ShadersPro.h"
+#include <GLFW/glfw3.h>
 
 class Camera
 {
@@ -19,11 +20,14 @@ private:
 
 	int screen_width = 800;
 	int screen_height = 600;
+
+	void RecalculateAxis();
 	
 public:
 	Camera(int width, int height);
 	~Camera();
 	void OnMouseInput(double xpos, double ypos);
+	void OnKeyInput(GLFWwindow* window);
 	void OnWindowResize(int width, int height);
 	void SetMatrices(ShaderProgram* shader);
 	glm::mat4 GetViewMatrix();

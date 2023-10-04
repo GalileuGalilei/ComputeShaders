@@ -1,7 +1,14 @@
 #include "Camera.h"
+#include <glad/glad.h>
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
-#include <glad/glad.h>
+
+void Camera::RecalculateAxis()
+{
+	camera_direction = glm::normalize(camera_position - camera_target);
+	camera_x_axis = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), camera_direction));
+	camera_y_axis = glm::cross(camera_direction, camera_x_axis);
+}
 
 Camera::Camera(int width, int height)
 {
@@ -10,15 +17,46 @@ Camera::Camera(int width, int height)
 
 	camera_position = glm::vec3(0.0f, 0.0f, 3.0f);
 	camera_target = glm::vec3(0.0f, 0.0f, 0.0f);
-	camera_direction = glm::normalize(camera_position - camera_target);
-	camera_x_axis = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), camera_direction));
-	camera_y_axis = glm::cross(camera_direction, camera_x_axis);
+	RecalculateAxis();
 
 	OnWindowResize(width, height);
 }
 
 Camera::~Camera()
 {
+}
+
+void Camera::OnKeyInput(GLFWwindow* window)
+{
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE))
+	{
+		glfwSetWindowShouldClose(window, true);
+	}
+	
+	const float cameraSpeed = 0.1f; // adjust accordingly
+	
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	{
+		camera_position -= cameraSpeed * camera_direction;
+		camera_target -= cameraSpeed * camera_direction;
+	}
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+	{
+		camera_position += cameraSpeed * camera_direction;
+		camera_target += cameraSpeed * camera_direction;
+	}
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+	{
+		camera_position -= camera_x_axis * cameraSpeed;
+		camera_target -= camera_x_axis * cameraSpeed;
+	}
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	{
+		camera_position += camera_x_axis * cameraSpeed;
+		camera_target += camera_x_axis * cameraSpeed;
+	}
+	
+	RecalculateAxis();
 }
 
 void Camera::OnMouseInput(double xpos, double ypos)
@@ -30,7 +68,7 @@ void Camera::OnMouseInput(double xpos, double ypos)
 		first_mouse = false;
 	}
 
-	float xoffset = xpos - lastX;
+	float xoffset = lastX - xpos;
 	float yoffset = lastY - ypos;
 
 	lastX = xpos;
@@ -39,18 +77,14 @@ void Camera::OnMouseInput(double xpos, double ypos)
 	xoffset *= sensitivity;
 	yoffset *= sensitivity;
 
-	camera_direction = glm::normalize(camera_position - camera_target);
-	camera_x_axis = glm::cross(camera_direction, glm::vec3(0.0f, 1.0f, 0.0f));
-	camera_y_axis = glm::cross(camera_direction, camera_x_axis);
-
 	glm::mat4 rotation_matrix = glm::mat4(1.0f);
+	rotation_matrix = glm::translate(rotation_matrix, camera_position);
 	rotation_matrix = glm::rotate(rotation_matrix, glm::radians(xoffset), camera_y_axis);
 	rotation_matrix = glm::rotate(rotation_matrix, glm::radians(yoffset), camera_x_axis);
-
-	camera_position = glm::vec3(rotation_matrix * glm::vec4(camera_position, 1.0f));
-	camera_direction = glm::normalize(camera_position - camera_target);
-	camera_x_axis = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), camera_direction));
-	camera_y_axis = glm::cross(camera_direction, camera_x_axis);
+	rotation_matrix = glm::translate(rotation_matrix, -camera_position);
+	camera_target = rotation_matrix * glm::vec4(camera_target, 1.0f);
+	
+	RecalculateAxis();
 }
 
 void Camera::SetMatrices(ShaderProgram* shader)
