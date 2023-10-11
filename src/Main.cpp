@@ -93,6 +93,7 @@ void InitOpenGL()
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	//errors
 	//glEnable(GL_DEBUG_OUTPUT);
@@ -115,7 +116,7 @@ int main()
 	SHADER.Use();
 
 	//textures
-	Texture* tex = new Texture("metal.jpg", true, GL_RGBA32F);
+	Texture* tex = new Texture("resources/metal.jpg", true, GL_RGBA32F);
 	SHADER.SetTexture(tex, "Texture0");
 
 	//vertices

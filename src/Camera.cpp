@@ -33,27 +33,28 @@ void Camera::OnKeyInput(GLFWwindow* window)
 		glfwSetWindowShouldClose(window, true);
 	}
 	
-	const float cameraSpeed = 0.1f; // adjust accordingly
+	float deltaTime = glfwGetTime() - lastUpdate;
+	lastUpdate = glfwGetTime();
 	
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
-		camera_position -= cameraSpeed * camera_direction;
-		camera_target -= cameraSpeed * camera_direction;
+		camera_position -= CameraSpeed * camera_direction * deltaTime;
+		camera_target -= CameraSpeed * camera_direction * deltaTime;
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
-		camera_position += cameraSpeed * camera_direction;
-		camera_target += cameraSpeed * camera_direction;
+		camera_position += CameraSpeed * camera_direction * deltaTime;
+		camera_target += CameraSpeed * camera_direction * deltaTime;
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
-		camera_position -= camera_x_axis * cameraSpeed;
-		camera_target -= camera_x_axis * cameraSpeed;
+		camera_position -= camera_x_axis * CameraSpeed * deltaTime;
+		camera_target -= camera_x_axis * CameraSpeed * deltaTime;
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
-		camera_position += camera_x_axis * cameraSpeed;
-		camera_target += camera_x_axis * cameraSpeed;
+		camera_position += camera_x_axis * CameraSpeed * deltaTime;
+		camera_target += camera_x_axis * CameraSpeed * deltaTime;
 	}
 	
 	RecalculateAxis();

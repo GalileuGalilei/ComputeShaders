@@ -176,7 +176,7 @@ void ShaderProgram::SetTexture(Texture* tex, const char* sampler)
 		glUniform1i(location, texturesBinds.size());
 	}
 
-	texturesBinds.insert(std::pair<unsigned int, unsigned int>(texturesBinds.size(), tex->Id()));
+	texturesBinds.insert(std::pair<unsigned int, unsigned int>(tex->Id(), texturesBinds.size()));
 	tex->Unbind();
 }
 
@@ -194,7 +194,8 @@ GLuint ShaderProgram::GetUniformLocation(const char* Name, const char* computeSh
 
 void ShaderProgram::ActivateTexture(Texture* tex)
 {
-	glActiveTexture(texturesBinds[tex->Id()] + GL_TEXTURE0);
+	int bind = texturesBinds.at(tex->Id());
+	glActiveTexture(bind + GL_TEXTURE0);
 	tex->Bind();
 }
 
