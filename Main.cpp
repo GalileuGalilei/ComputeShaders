@@ -111,12 +111,15 @@ int main()
 	
 	SHADER.CreateShader(GL_VERTEX_SHADER, "shaders/VertexShader.glsl");
 	SHADER.CreateShader(GL_FRAGMENT_SHADER, "shaders/FragmentShader.glsl");
-	SHADER.CreateComputeShader("displace", "shaders/displace.glsl");
+	SHADER.CreateComputeShader("fractal", "shaders/fractal.glsl");
 	SHADER.Use();
 
 	//textures
-	Texture* tex = new Texture("metal.jpg", true, GL_RGBA32F);
-	SHADER.SetTexture(tex, "Texture0");
+	//Texture* tex = new Texture("metal.jpg", true, GL_RGBA32F);
+	RenderTexture* render_tex = new RenderTexture(window_width, window_heigh, GL_RGBA32F);
+	SHADER.SetTexture(render_tex, "Texture0");
+	SHADER.ActivateTexture(render_tex);
+	SHADER.DispatchComputeShader("fractal", window_width, window_heigh, 1);
 
 	//vertices
 	Mesh* mesh = new Mesh();
@@ -140,7 +143,7 @@ int main()
 		cam.SetMatrices(&SHADER);
 		
 		//binding all
-		SHADER.ActivateTexture(tex);
+		SHADER.ActivateTexture(render_tex);
 		SHADER.Use();
 
 		//models uniforms
