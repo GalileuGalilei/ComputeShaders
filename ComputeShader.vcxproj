@@ -122,7 +122,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\glfw\include;$(SolutionDir)include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include</AdditionalIncludeDirectories>
       <UseStandardPreprocessor>
       </UseStandardPreprocessor>
     </ClCompile>
@@ -130,7 +130,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>glfw3.lib;opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)glfw</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -156,8 +156,7 @@
     <ClCompile Include="glfw\include\glm\detail\glm.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="src\Camera.cpp" />
-    <ClCompile Include="camera\cam.cpp" />
-    <ClCompile Include="GLAD\src\glad.c" />
+    <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\ShaderPro.cpp" />
     <ClCompile Include="src\stb_image.cpp">
@@ -457,9 +456,8 @@
     <ClInclude Include="glfw\include\glm\vector_relational.hpp" />
     <ClInclude Include="glfw\include\KHR\khrplatform.h" />
     <ClInclude Include="include\Camera.h" />
-    <ClInclude Include="camera\cam.h" />
-    <ClInclude Include="GLAD\include\glad\glad.h" />
-    <ClInclude Include="glfw\include\glad\glad.h" />
+    <ClInclude Include="include\glad\glad.h" />
+    <ClInclude Include="include\KHR\khrplatform.h" />
     <ClInclude Include="include\ShadersPro.h" />
     <ClInclude Include="include\stb_image.h" />
     <ClInclude Include="include\stb_image_write.h" />
@@ -612,7 +610,10 @@
     <None Include="shaders\VertexShader.glsl" />
   </ItemGroup>
   <ItemGroup>
-    <Library Include="glfw\glfw3.lib" />
+    <Library Include="lib\glfw3.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\metal.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

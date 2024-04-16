@@ -1,2 +1,2 @@
 # ComputeShaders
-I hope i can turn this into something crazier in the future
+A little project to render complex images(fractals usually) using OpenGL compute shaders.

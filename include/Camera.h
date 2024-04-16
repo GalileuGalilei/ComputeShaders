@@ -17,6 +17,7 @@ private:
 	float lastX = 0.0f;
 	float lastY = 0.0f;
 	float sensitivity = 0.1f;
+	float lastUpdate = 0.0f;
 
 	int screen_width = 800;
 	int screen_height = 600;
@@ -24,6 +25,7 @@ private:
 	void RecalculateAxis();
 	
 public:
+	float CameraSpeed = 4.0f;
 	Camera(int width, int height);
 	~Camera();
 	void OnMouseInput(double xpos, double ypos);
