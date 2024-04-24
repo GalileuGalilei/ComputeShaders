@@ -25,7 +25,7 @@ char** ShaderSource(const char* Path, GLint& lenght)
 	}
 	else
 	{
-		std::cout << "erro ao abrir arquivo :(";
+		std::cout << "Failed to load shader file";
 	}
 };
 
