@@ -165,7 +165,6 @@
     <ClCompile Include="src\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="glfw\include\GLFW\glfw3.h" />
     <ClInclude Include="glfw\include\GLFW\glfw3native.h" />
     <ClInclude Include="glfw\include\glm\common.hpp" />
     <ClInclude Include="glfw\include\glm\detail\compute_common.hpp" />
@@ -456,6 +455,8 @@
     <ClInclude Include="glfw\include\KHR\khrplatform.h" />
     <ClInclude Include="include\Camera.h" />
     <ClInclude Include="include\glad\glad.h" />
+    <ClInclude Include="include\glfw\glfw3.h" />
+    <ClInclude Include="include\glfw\glfw3native.h" />
     <ClInclude Include="include\glm\common.hpp" />
     <ClInclude Include="include\glm\detail\compute_common.hpp" />
     <ClInclude Include="include\glm\detail\compute_vector_relational.hpp" />
