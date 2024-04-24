@@ -1,10 +1,13 @@
+#include <iostream>
+
 #include "glad/glad.h" 
 #include "GLFW/glfw3.h"
-#include "iostream"
+#include <glm/gtc/type_ptr.hpp>
+
 #include "ShadersPro.h"
 #include "Mesh.h"
 #include "Camera.h"
-#include "glm/gtc/type_ptr.hpp"
+
 
 int window_width = 520;
 int window_heigh = 520;
@@ -116,7 +119,6 @@ int main()
 	SHADER.Use();
 
 	//textures
-	//Texture* tex = new Texture("metal.jpg", true, GL_RGBA32F);
 	RenderTexture* render_tex = new RenderTexture(window_width, window_heigh, GL_RGBA32F);
 	SHADER.SetTexture(render_tex, "Texture0");
 	SHADER.ActivateTexture(render_tex);
